@@ -1,0 +1,37 @@
+---
+- name: Instalar dependências
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  loop:
+    - docker.io
+    - docker-compose
+    - python3-pip
+  when: ansible_os_family == "Debian"
+
+- name: Instalar Python Docker SDK
+  pip:
+    name: docker
+    state: present
+
+- name: Criar diretório para o projeto
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "/opt/hadoop-spark-cluster"
+    - "/opt/hadoop-spark-cluster/data"
+    - "/opt/hadoop-spark-cluster/config"
+    - "/opt/hadoop-spark-cluster/logs"
+    
+- name: Criar rede Docker para o cluster
+  docker_network:
+    name: hadoop_network
+    driver: bridge
+
+- name: Template docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/hadoop-spark-cluster/docker-compose.yml

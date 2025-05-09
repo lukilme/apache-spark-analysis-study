@@ -1,0 +1,105 @@
+services:
+  namenode:
+    container_name: hadoop-namenode
+    image: hadoop-namenode:latest
+    build:
+      context: ./hadoop-namenode
+    ports:
+      - "9870:9870"   # HDFS Web UI
+      - "8020:8020"   # HDFS
+    volumes:
+      - /opt/hadoop-spark-cluster/data/namenode:/hadoop/dfs/name
+      - /opt/hadoop-spark-cluster/logs/namenode:/hadoop/logs
+    environment:
+      - HADOOP_CONF_DIR=/etc/hadoop
+      - CLUSTER_NAME=hadoop-cluster
+    networks:
+      - hadoop_network
+
+  datanode1:
+    container_name: hadoop-datanode1
+    image: hadoop-datanode:latest
+    build:
+      context: ./hadoop-datanode
+    volumes:
+      - /opt/hadoop-spark-cluster/data/datanode1:/hadoop/dfs/data
+      - /opt/hadoop-spark-cluster/logs/datanode1:/hadoop/logs
+    environment:
+      - HADOOP_CONF_DIR=/etc/hadoop
+      - NAMENODE_HOST=namenode
+    depends_on:
+      - namenode
+    networks:
+      - hadoop_network
+
+  datanode2:
+    container_name: hadoop-datanode2
+    image: hadoop-datanode:latest
+    build:
+      context: ./hadoop-datanode
+    volumes:
+      - /opt/hadoop-spark-cluster/data/datanode2:/hadoop/dfs/data
+      - /opt/hadoop-spark-cluster/logs/datanode2:/hadoop/logs
+    environment:
+      - HADOOP_CONF_DIR=/etc/hadoop
+      - NAMENODE_HOST=namenode
+    depends_on:
+      - namenode
+    networks:
+      - hadoop_network
+
+  spark-master:
+    container_name: spark-master
+    image: spark-master:latest
+    build:
+      context: ./spark-master
+    ports:
+      - "8080:8080"   # Spark Web UI
+      - "7077:7077"   # Spark Master
+    volumes:
+      - /opt/hadoop-spark-cluster/logs/spark-master:/spark/logs
+    environment:
+      - SPARK_CONF_DIR=/spark/conf
+      - HADOOP_CONF_DIR=/etc/hadoop
+    depends_on:
+      - namenode
+    networks:
+      - hadoop_network
+
+  spark-worker1:
+    container_name: spark-worker1
+    image: spark-worker:latest
+    build:
+      context: ./spark-worker
+    volumes:
+      - /opt/hadoop-spark-cluster/logs/spark-worker1:/spark/logs
+    environment:
+      - SPARK_CONF_DIR=/spark/conf
+      - SPARK_MASTER_HOST=spark-master
+      - SPARK_WORKER_CORES=2
+      - SPARK_WORKER_MEMORY=2g
+    depends_on:
+      - spark-master
+    networks:
+      - hadoop_network
+
+  spark-worker2:
+    container_name: spark-worker2
+    image: spark-worker:latest
+    build:
+      context: ./spark-worker
+    volumes:
+      - /opt/hadoop-spark-cluster/logs/spark-worker2:/spark/logs
+    environment:
+      - SPARK_CONF_DIR=/spark/conf
+      - SPARK_MASTER_HOST=spark-master
+      - SPARK_WORKER_CORES=2
+      - SPARK_WORKER_MEMORY=2g
+    depends_on:
+      - spark-master
+    networks:
+      - hadoop_network
+
+networks:
+  hadoop_network:
+    external: true
