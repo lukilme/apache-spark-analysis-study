@@ -7,4 +7,6 @@
 *.cfg linguist-detectable=true
 *.cfg linguist-language=cfg
 *.ipynb linguist-detectable=false
+*.yml linguist-detectable=true
+*.yml linguist-language=yml
 *.hive.sql text
