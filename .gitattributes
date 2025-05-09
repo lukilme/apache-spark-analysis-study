@@ -1,0 +1,10 @@
+*.hive.sql linguist-detectable=true
+*.hive.sql linguist-language=hiveql
+*.xml linguist-detectable=true
+*.xml linguist-language=xml
+*.conf linguist-detectable=true
+*.conf linguist-language=ini
+*.hive.sql linguist-detectable=true
+*.cfg linguist-language=cfg
+*.ipynb linguist-detectable=false
+*.hive.sql text
