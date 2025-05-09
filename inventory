@@ -1,0 +1,16 @@
+[hadoop_cluster]
+hadoop-master ansible_host=localhost ansible_connection=local
+hadoop-worker1 ansible_host=localhost ansible_connection=local
+hadoop-worker2 ansible_host=localhost ansible_connection=local
+
+[namenode]
+hadoop-master
+
+[datanodes]
+hadoop-worker[1:2]
+
+[spark_master]
+hadoop-master
+
+[spark_workers]
+hadoop-worker[1:2]
